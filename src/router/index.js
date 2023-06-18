@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
-import LoginView from "../views/LoginView.vue";
-import RegisterView from "../views/RegisterView.vue";
-import UserView from "../views/UserView.vue";
+
+import HomePage from "../views/HomePage.vue";
+import { useUserStore } from "../stores/user.js";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -9,28 +9,55 @@ const router = createRouter({
     {
       path: "/",
       name: "home",
-      component: RegisterView,
+      component: HomePage,
+    },
+    {
+      path: "/query",
+      name: "query",
+      component: () => import("../views/QueryView.vue"),
     },
     {
       path: "/login",
       name: "login",
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      // component: () => import('../views/AboutView.vue')
-      component: LoginView,
+      component: () => import("../views/LoginView.vue"),
     },
     {
       path: "/register",
       name: "register",
-      component: RegisterView,
+      component: () => import("../views/RegisterView.vue"),
     },
     {
       path: "/user",
       name: "user-info",
-      component: UserView,
+      component: () => import("../views/UserView.vue"),
+    },
+    {
+      path: "/create-house",
+      component: () => import("../views/HouseCreate.vue"),
+    },
+    {
+      path: "/my-houses",
+      component: () => import("../views/HouseOwns.vue"),
+    },
+    {
+      path: "/house/:id",
+      component: () => import("../views/HouseDetail.vue"),
+    },
+    {
+      path: "/my-orders",
+      component: () => import("../views/OrderView.vue"),
     },
   ],
+});
+
+router.beforeEach(async (to, from, next) => {
+  const store = useUserStore();
+
+  if (!store.user.name) {
+    await store.auth();
+  }
+
+  next();
 });
 
 export default router;
